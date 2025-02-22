@@ -1,4 +1,5 @@
 import supabase from "./supabase";
+import { supabaseUrl } from "./supabase";
 
 export async function getSettings() {
   const { data, error } = await supabase.from("settings").select("*").single();
@@ -11,25 +12,37 @@ export async function getSettings() {
 }
 
 export async function createCabin(newcabin) {
-  console.log(newcabin);
+  const imageName = `${Math.random()}-${newcabin.imageName}`.replace(/\//g, "");
+  const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
 
-  const { data, error } = await supabase
-    .from("cabins")
-    .insert([newcabin])
-    .select("id, name");
-  if (error) {
-    console.error(error);
-    throw new Error("Settings could not be created");
+  const { data: imageData, error: imageError } = await supabase.storage
+    .from("cabin-images")
+    .upload(imageName, newcabin.image);
+
+  if (imageError) {
+    console.error("Image upload failed:", imageError.message);
+    throw new Error("Image upload failed");
   }
-  return data;
+
+  const cabinWithImage = { ...newcabin, image: imagePath };
+
+  const { data: cabinData, error: cabinError } = await supabase
+    .from("cabins")
+    .insert([cabinWithImage])
+    .select("id, name");
+
+  if (cabinError) {
+    console.error(cabinError);
+    throw new Error("Cabin could not be created");
+  }
+
+  return cabinData;
 }
 
-// We expect a newSetting object that looks like {setting: newValue}
 export async function updateSetting(newSetting) {
   const { data, error } = await supabase
     .from("settings")
     .update(newSetting)
-    // There is only ONE row of settings, and it has the ID=1, and so this is the updated one
     .eq("id", 1)
     .single();
 
