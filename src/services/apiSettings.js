@@ -11,32 +11,50 @@ export async function getSettings() {
   return data;
 }
 
-export async function createCabin(newcabin) {
-  const imageName = `${Math.random()}-${newcabin.imageName}`.replace(/\//g, "");
-  const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+export async function createEditeCabin(newCabin, id) {
+  const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
 
-  const { data: imageData, error: imageError } = await supabase.storage
-    .from("cabin-images")
-    .upload(imageName, newcabin.image);
+  const imageName = `${Math.random()}-${newCabin.image.name}`.replaceAll(
+    "/",
+    ""
+  );
+  const imagePath = hasImagePath
+    ? newCabin.image
+    : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
 
-  if (imageError) {
-    console.error("Image upload failed:", imageError.message);
-    throw new Error("Image upload failed");
-  }
+  // 1. Create/edit cabin
+  let query = supabase.from("cabins");
 
-  const cabinWithImage = { ...newcabin, image: imagePath };
+  // A) CREATE
+  if (!id) query = query.insert([{ ...newCabin, image: imagePath }]);
 
-  const { data: cabinData, error: cabinError } = await supabase
-    .from("cabins")
-    .insert([cabinWithImage])
-    .select("id, name");
+  // B) EDIT
+  if (id) query = query.update({ ...newCabin, image: imagePath }).eq("id", id);
 
-  if (cabinError) {
-    console.error(cabinError);
+  const { data, error } = await query.select().single();
+
+  if (error) {
+    console.error(error);
     throw new Error("Cabin could not be created");
   }
 
-  return cabinData;
+  // 2. Upload image
+  if (hasImagePath) return data;
+
+  const { error: storageError } = await supabase.storage
+    .from("cabin-images")
+    .upload(imageName, newCabin.image);
+
+  // 3. Delete the cabin IF there was an error uplaoding image
+  if (storageError) {
+    await supabase.from("cabins").delete().eq("id", data.id);
+    console.error(storageError);
+    throw new Error(
+      "Cabin image could not be uploaded and the cabin was not created"
+    );
+  }
+
+  return data;
 }
 
 export async function updateSetting(newSetting) {
