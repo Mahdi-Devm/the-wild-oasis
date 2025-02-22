@@ -15,13 +15,23 @@ const Main = styled.main`
   padding: 4rem 4.8rem 6.4rem;
 `;
 
+const Contianer = styled.div`
+  max-width: 120rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+`;
+
 function AppLayout() {
   return (
     <StyledLayoute>
       <Header />
       <Sidebar />
       <Main>
-        <Outlet />
+        <Contianer>
+          <Outlet />
+        </Contianer>
       </Main>
     </StyledLayoute>
   );

@@ -10,6 +10,20 @@ export async function getSettings() {
   return data;
 }
 
+export async function createCabin(newcabin) {
+  console.log(newcabin);
+
+  const { data, error } = await supabase
+    .from("cabins")
+    .insert([newcabin])
+    .select("id, name");
+  if (error) {
+    console.error(error);
+    throw new Error("Settings could not be created");
+  }
+  return data;
+}
+
 // We expect a newSetting object that looks like {setting: newValue}
 export async function updateSetting(newSetting) {
   const { data, error } = await supabase
