@@ -1,19 +1,19 @@
+import PropTypes from "prop-types";
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createEditeCabin } from "../../services/apiSettings";
-import toast from "react-hot-toast";
+
 import FormRow from "../../ui/FormRow";
+import useCreateCabin from "./useCreateCabin";
+import useEditecabin from "./useEditecabin";
 
 function CreateCabinForm({ cabinToEdit = {} }) {
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditeSessin = Boolean(editId);
-
-  const queryClient = useQueryClient();
+  const { editecabin, isediteing } = useEditecabin();
   const {
     register,
     handleSubmit,
@@ -24,39 +24,26 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     defaultValues: isEditeSessin ? editValues : {},
   });
 
-  const { mutate: createcabin, isLoading } = useMutation({
-    mutationFn: createEditeCabin,
-    onSuccess: () => {
-      toast.success("New cabin created successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-        refetchInactive: true,
-      });
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
-  const { mutate: editecabin, isLoading: isediteing } = useMutation({
-    mutationFn: ({ newCabinData, id }) => createEditeCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success("cibin succsessfully edite");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-        refetchInactive: true,
-      });
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
+  const { createcabin, isLoading } = useCreateCabin();
 
   const isWorking = isediteing || isLoading;
   function onSubmit(data) {
     const image = typeof data.image === "string" ? data.image : data.image[0];
 
     if (isEditeSessin) {
-      editecabin({ newCabinData: { ...data, image }, id: editId });
+      editecabin(
+        { newCabinData: { ...data, image }, id: editId },
+        {
+          onSuccess: () => reset(),
+        }
+      );
     } else {
-      createcabin({ ...data, image: data.image[0] });
+      createcabin(
+        { ...data, image: data.image[0] },
+        {
+          onSuccess: () => reset(),
+        }
+      );
     }
   }
 
@@ -150,5 +137,17 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     </Form>
   );
 }
+
+CreateCabinForm.propTypes = {
+  cabinToEdit: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
+    maxCapacity: PropTypes.number,
+    regularPrice: PropTypes.number,
+    discount: PropTypes.number,
+    description: PropTypes.string,
+    image: PropTypes.string,
+  }),
+};
 
 export default CreateCabinForm;
