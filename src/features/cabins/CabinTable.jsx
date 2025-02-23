@@ -1,7 +1,5 @@
 import PropTypes from "prop-types";
-import { useQuery } from "@tanstack/react-query";
 import styled from "styled-components";
-import { getCabins } from "../../services/apicabins";
 import Spinner from "../../ui/Spinner";
 import CabinRow from "./CabinRow";
 import useCabin from "./useCabin";
