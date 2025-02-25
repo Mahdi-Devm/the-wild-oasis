@@ -4,6 +4,7 @@ import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleateCabin } from "./useDeletCabin";
+import useCreateCabin from "./useCreateCabin";
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -52,8 +53,17 @@ function CabinRow({ cabin }) {
     discount,
     image,
   } = cabin;
-
   const { isdeleteing, deletecabin } = useDeleateCabin();
+  const { createcabin, isLoading } = useCreateCabin();
+  function handelDup() {
+    createcabin({
+      name: `Cope of ${name}`,
+      maxCapacity,
+      regularPrice,
+      discount,
+      image,
+    });
+  }
   return (
     <>
       <TableRow role="row">
@@ -67,6 +77,7 @@ function CabinRow({ cabin }) {
           <span>- -</span>
         )}
         <div>
+          <button onClick={handelDup}>Dep</button>
           <button onClick={() => setshow(() => !show)}>Edit</button>
           <button onClick={() => deletecabin(cabinId)} disabled={isdeleteing}>
             Delete

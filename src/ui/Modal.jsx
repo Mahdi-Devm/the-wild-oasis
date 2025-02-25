@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import { CiCircleRemove } from "react-icons/ci";
 const StyledModal = styled.div`
   position: fixed;
   top: 50%;
@@ -48,3 +48,18 @@ const Button = styled.button`
     color: var(--color-grey-500);
   }
 `;
+
+function Modal({ children }) {
+  return (
+    <Overlay>
+      <StyledModal>
+        <Button>
+          <CiCircleRemove />
+        </Button>
+        <div>{children}</div>
+      </StyledModal>
+    </Overlay>
+  );
+}
+
+export default Modal;
