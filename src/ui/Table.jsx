@@ -1,9 +1,10 @@
 import { createContext, useContext } from "react";
-import PropTypes from "prop-types";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
+
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
@@ -20,6 +21,7 @@ const CommonRow = styled.div`
 
 const StyledHeader = styled(CommonRow)`
   padding: 1.6rem 2.4rem;
+
   background-color: var(--color-grey-50);
   border-bottom: 1px solid var(--color-grey-100);
   text-transform: uppercase;
@@ -46,9 +48,17 @@ const Footer = styled.footer`
   justify-content: center;
   padding: 1.2rem;
 
+  /* This will hide the footer when it contains no child elements. Possible thanks to the parent selector :has 🎉 */
   &:not(:has(*)) {
     display: none;
   }
+`;
+
+const Empty = styled.p`
+  font-size: 1.6rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 2.4rem;
 `;
 
 const TableContext = createContext();
@@ -61,11 +71,6 @@ function Table({ columns, children }) {
   );
 }
 
-Table.propTypes = {
-  columns: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-};
-
 function Header({ children }) {
   const { columns } = useContext(TableContext);
   return (
@@ -74,11 +79,6 @@ function Header({ children }) {
     </StyledHeader>
   );
 }
-
-Header.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
 function Row({ children }) {
   const { columns } = useContext(TableContext);
   return (
@@ -88,16 +88,32 @@ function Row({ children }) {
   );
 }
 
+function Body({ data, render }) {
+  if (!data.length) return <Empty>No data to show at the moment</Empty>;
+
+  return <StyledBody>{data.map(render)}</StyledBody>;
+}
+
+Table.propTypes = {
+  columns: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
+Header.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
 Row.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-function Body({ children }) {
-  return <StyledBody>{children}</StyledBody>;
-}
-
 Body.propTypes = {
-  children: PropTypes.node.isRequired,
+  data: PropTypes.array.isRequired,
+  render: PropTypes.func.isRequired,
+};
+
+Footer.propTypes = {
+  children: PropTypes.node,
 };
 
 Table.Header = Header;
