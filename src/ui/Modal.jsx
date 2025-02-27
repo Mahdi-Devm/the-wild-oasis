@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import { CiCircleRemove } from "react-icons/ci";
 import { createPortal } from "react-dom";
 import { cloneElement, createContext, useContext, useState } from "react";
@@ -53,23 +54,22 @@ const Button = styled.button`
 
 const ModalContext = createContext();
 
-function Modal({ Children }) {
+function Modal({ children }) {
   const [openName, setOpenName] = useState("");
 
   const close = () => setOpenName("");
   const open = setOpenName;
 
   return (
-    <ModalContext.Provider value={{ openName, close }}>
-      {Children}
+    <ModalContext.Provider value={{ open, openName, close }}>
+      {children}
     </ModalContext.Provider>
   );
 }
 
-function Open({ Children, Opens: opensWindowName }) {
+function Open({ children, opens: opensWindowName }) {
   const { open } = useContext(ModalContext);
-
-  return cloneElement(Children, { onClick: () => open(opensWindowName) });
+  return cloneElement(children, { onClick: () => open(opensWindowName) });
 }
 
 function Window({ children, name }) {
@@ -84,13 +84,26 @@ function Window({ children, name }) {
         <Button onClick={close}>
           <CiCircleRemove />
         </Button>
-        <div>{children}</div>
+        <div>{cloneElement(children, { onclose: close })}</div>
       </StyledModal>
     </Overlay>,
     document.body
   );
 }
+Modal.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+Open.propTypes = {
+  children: PropTypes.element.isRequired,
+  opens: PropTypes.string.isRequired,
+};
+
+Window.propTypes = {
+  children: PropTypes.element.isRequired,
+  name: PropTypes.string.isRequired,
+};
 
 Modal.Open = Open;
-Modal.window = window;
+Modal.Window = Window;
 export default Modal;
