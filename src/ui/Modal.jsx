@@ -86,16 +86,17 @@ function Window({ children, name }) {
 
   useEffect(
     function () {
-      function handelclick(e) {
+      const handleclick = (e) => {
         if (ref.current && !ref.current.contains(e.target)) {
           close();
         }
-      }
-      document.addEventListener("click", handelclick);
-      return () => document.removeEventListener("click", handelclick);
+      };
+      document.addEventListener("click", handleclick, true);
+      return () => document.removeEventListener("click", handleclick);
     },
-    [close]
+    [close, ref]
   );
+
   if (name !== openName) {
     return null;
   }
