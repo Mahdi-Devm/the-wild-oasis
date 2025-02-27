@@ -2,7 +2,14 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 import { CiCircleRemove } from "react-icons/ci";
 import { createPortal } from "react-dom";
-import { cloneElement, createContext, useContext, useState } from "react";
+import {
+  cloneElement,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 const StyledModal = styled.div`
   position: fixed;
   top: 50%;
@@ -75,12 +82,26 @@ function Open({ children, opens: opensWindowName }) {
 function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
 
+  const ref = useRef();
+
+  useEffect(
+    function () {
+      function handelclick(e) {
+        if (ref.current && !ref.current.contains(e.target)) {
+          close();
+        }
+      }
+      document.addEventListener("click", handelclick);
+      return () => document.removeEventListener("click", handelclick);
+    },
+    [close]
+  );
   if (name !== openName) {
     return null;
   }
   return createPortal(
     <Overlay>
-      <StyledModal>
+      <StyledModal ref={ref}>
         <Button onClick={close}>
           <CiCircleRemove />
         </Button>
