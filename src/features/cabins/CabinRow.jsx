@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { useState } from "react";
-import CreateCabinForm from "./CreateCabinForm";
 import { useDeleateCabin } from "./useDeletCabin";
 import useCreateCabin from "./useCreateCabin";
+import Modal from "../../ui/Modal";
+import CreateCabinForm from "./CreateCabinForm";
+import ConfirmDelete from "../../ui/ConfirmDelete";
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -44,7 +45,6 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 function CabinRow({ cabin }) {
-  const [show, setshow] = useState(false);
   const {
     id: cabinId,
     name,
@@ -78,13 +78,26 @@ function CabinRow({ cabin }) {
         )}
         <div>
           <button onClick={handelDup}>Dep</button>
-          <button onClick={() => setshow(() => !show)}>Edit</button>
-          <button onClick={() => deletecabin(cabinId)} disabled={isdeleteing}>
-            Delete
-          </button>
+          <Modal>
+            <Modal.Open opens="edit">
+              <button>Edit</button>
+            </Modal.Open>
+            <Modal.Window name="edit">
+              <CreateCabinForm cabinToEdit={cabin} />
+            </Modal.Window>
+            <Modal.Open>
+              <button disabled={isdeleteing}>Delete</button>
+            </Modal.Open>
+            <Modal.Window>
+              <ConfirmDelete
+                resourceName="cabin"
+                disabled={isdeleteing}
+                onConfirm={() => deletecabin(cabinId)}
+              />
+            </Modal.Window>
+          </Modal>
         </div>
       </TableRow>
-      {show && <CreateCabinForm cabinToEdit={cabin} />}
     </>
   );
 }
