@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "styled-components";
 
 const StyledMenu = styled.div`
@@ -60,3 +61,21 @@ const StyledButton = styled.button`
     transition: all 0.3s;
   }
 `;
+
+function Menus({ children }) {
+  const [openId, setOpenId] = useState("");
+  const [position, setPosition] = useState(null);
+
+  const close = () => setOpenId("");
+  const open = setOpenId;
+
+  return (
+    <MenusContext.Provider
+      value={{ openId, close, open, position, setPosition }}
+    >
+      {children}
+    </MenusContext.Provider>
+  );
+}
+
+export default Menus;
