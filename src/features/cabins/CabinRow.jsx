@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 import CreateCabinForm from "./CreateCabinForm";
-import { useDeleateCabin } from "./useDeletCabin";
+import { useDeleteCabin } from "./useDeleteCabin";
 import { formatCurrency } from "../../utils/helpers";
 import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
 import useCreateCabin from "./useCreateCabin";
@@ -50,7 +50,7 @@ const Discount = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const { isDeleting, deleteCabin } = useDeleateCabin();
+  const { isDeleting, deleteCabin } = useDeleteCabin();
   const { createCabin } = useCreateCabin();
 
   const {
