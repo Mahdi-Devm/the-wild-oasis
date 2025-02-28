@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { HiEllipsisVertical } from "react-icons/hi2";
 import styled from "styled-components";
 import { useOutsideClick } from "../hooks/useOutsideClick";
+import PropTypes from "prop-types";
 
 const Menu = styled.div`
   display: flex;
@@ -134,6 +135,24 @@ function Button({ children, icon, onClick }) {
     </li>
   );
 }
+Menus.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+Toggle.propTypes = {
+  id: PropTypes.string.isRequired,
+};
+
+List.propTypes = {
+  id: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
+Button.propTypes = {
+  children: PropTypes.node.isRequired,
+  icon: PropTypes.node.isRequired,
+  onClick: PropTypes.func,
+};
 
 Menus.Menu = Menu;
 Menus.Toggle = Toggle;
