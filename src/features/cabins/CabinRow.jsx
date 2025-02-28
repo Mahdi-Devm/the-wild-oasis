@@ -1,12 +1,15 @@
-import PropTypes from "prop-types";
 import styled from "styled-components";
-import { formatCurrency } from "../../utils/helpers";
+
+import CreateCabinForm from "./CreateCabinForm";
 import { useDeleateCabin } from "./useDeletCabin";
+import { formatCurrency } from "../../utils/helpers";
+import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
 import useCreateCabin from "./useCreateCabin";
 import Modal from "../../ui/Modal";
-import CreateCabinForm from "./CreateCabinForm";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
+import Menus from "../../ui/Menus";
+
 // const TableRow = styled.div`
 //   display: grid;
 //   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -45,7 +48,11 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
+
 function CabinRow({ cabin }) {
+  const { isDeleting, deleteCabin } = useDeleateCabin();
+  const { createCabin } = useCreateCabin();
+
   const {
     id: cabinId,
     name,
@@ -53,64 +60,66 @@ function CabinRow({ cabin }) {
     regularPrice,
     discount,
     image,
+    description,
   } = cabin;
-  const { isdeleteing, deletecabin } = useDeleateCabin();
-  const { createcabin, isLoading } = useCreateCabin();
-  function handelDup() {
-    createcabin({
-      name: `Cope of ${name}`,
+
+  function handleDuplicate() {
+    createCabin({
+      name: `Copy of ${name}`,
       maxCapacity,
       regularPrice,
       discount,
       image,
+      description,
     });
   }
+
   return (
-    <>
-      <Table.Row>
-        <Img src={image} />
-        <Cabin>{name}</Cabin>
-        <div>Fite up ti {maxCapacity} guests</div>
-        <Price>{formatCurrency(regularPrice)}</Price>
-        {discount ? (
-          <Discount>{formatCurrency(discount)}</Discount>
-        ) : (
-          <span>- -</span>
-        )}
-        <div>
-          <button onClick={handelDup}>Dep</button>
-          <Modal>
-            <Modal.Open opens="edit">
-              <button>Edit</button>
-            </Modal.Open>
+    <Table.Row>
+      <Img src={image} />
+      <Cabin>{name}</Cabin>
+      <div>Fits up to {maxCapacity} guests</div>
+      <Price>{formatCurrency(regularPrice)}</Price>
+      {discount ? (
+        <Discount>{formatCurrency(discount)}</Discount>
+      ) : (
+        <span>&mdash;</span>
+      )}
+      <div>
+        <Modal>
+          <Menus.Menu>
+            <Menus.Toggle id={cabinId} />
+
+            <Menus.List id={cabinId}>
+              <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}>
+                Duplicate
+              </Menus.Button>
+
+              <Modal.Open opens="edit">
+                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+              </Modal.Open>
+
+              <Modal.Open opens="delete">
+                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+              </Modal.Open>
+            </Menus.List>
+
             <Modal.Window name="edit">
               <CreateCabinForm cabinToEdit={cabin} />
             </Modal.Window>
-            <Modal.Open opens="delete">
-              <button disabled={isdeleteing}>Delete</button>
-            </Modal.Open>
+
             <Modal.Window name="delete">
               <ConfirmDelete
-                resourceName="cabin"
-                disabled={isdeleteing}
-                onConfirm={() => deletecabin(cabinId)}
+                resourceName="cabins"
+                disabled={isDeleting}
+                onConfirm={() => deleteCabin(cabinId)}
               />
             </Modal.Window>
-          </Modal>
-        </div>
-      </Table.Row>
-    </>
+          </Menus.Menu>
+        </Modal>
+      </div>
+    </Table.Row>
   );
 }
-CabinRow.propTypes = {
-  cabin: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    maxCapacity: PropTypes.number.isRequired,
-    regularPrice: PropTypes.number.isRequired,
-    discount: PropTypes.number,
-    image: PropTypes.string.isRequired,
-  }).isRequired,
-};
 
 export default CabinRow;

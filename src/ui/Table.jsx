@@ -1,6 +1,5 @@
 import { createContext, useContext } from "react";
 import styled from "styled-components";
-import PropTypes from "prop-types";
 
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -93,28 +92,6 @@ function Body({ data, render }) {
 
   return <StyledBody>{data.map(render)}</StyledBody>;
 }
-
-Table.propTypes = {
-  columns: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-};
-
-Header.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-Row.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-Body.propTypes = {
-  data: PropTypes.array.isRequired,
-  render: PropTypes.func.isRequired,
-};
-
-Footer.propTypes = {
-  children: PropTypes.node,
-};
 
 Table.Header = Header;
 Table.Body = Body;
