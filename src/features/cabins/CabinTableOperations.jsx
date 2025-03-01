@@ -3,7 +3,14 @@ import Filter from "../../ui/Filter";
 function CabinTableOperations() {
   return (
     <TableOperations>
-      <Filter />
+      <Filter
+        filterdield="discount"
+        options={[
+          { value: "all", lable: "ALL" },
+          { value: "no-discount", lable: "No discount" },
+          { value: "whit-discount", lable: "Whit discount" },
+        ]}
+      />
     </TableOperations>
   );
 }
